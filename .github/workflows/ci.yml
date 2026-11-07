@@ -33,7 +33,7 @@ jobs:
 
       - name: Install XNU and loader build dependencies
         run: |
-          brew install autoconf automake bison flex llvm
+          brew install autoconf automake bison flex llvm lld
 
       - name: Integrate the device configuration and loader profile
         run: |
@@ -51,7 +51,7 @@ jobs:
 
       - name: Build the Apple-free loader
         working-directory: hakios
-        run: PATH="$(brew --prefix llvm)/bin:$PATH" make loader-open
+        run: PATH="$(brew --prefix lld)/bin:$(brew --prefix llvm)/bin:$PATH" make loader-open
 
       - name: Build the configured XNU kernel
         working-directory: hakios
