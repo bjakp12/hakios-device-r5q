@@ -155,9 +155,16 @@ jobs:
       - name: Package the Android fastboot boot image
         working-directory: hakios
         run: |
+          set -euxo pipefail
           cp "$GITHUB_WORKSPACE/candidate/hakios-kernel" hakios-kernel
           cp "$GITHUB_WORKSPACE/candidate/loader.efi" xnuloader/loader.efi
           cp "$GITHUB_WORKSPACE/candidate/r5q-open-test.xnup" r5q-open-test.xnup
+          test -s u-boot/build-r5q/u-boot.bin
+          test -s xnuloader/loader.efi
+          test -s r5q-open-test.xnup
+          test -s devices/r5q/prebuilt/device-tree.dtb
+          python3 -m py_compile tools/mkubootimg.py devices/r5q/prebuilt/mkbootimg.py
+          python3 tools/mkubootimg.py --help
           python3 tools/mkubootimg.py -d r5q \
             -u u-boot/build-r5q/u-boot.bin \
             -l xnuloader/loader.efi \
