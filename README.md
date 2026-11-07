@@ -42,7 +42,7 @@ adb. The run scripts add it to the kernel command line. Where each argument come
 ## Bring-up findings (not a working port)
 
 - The live DTB identifies `Samsung R5Q PROJECT Rev09`, compatible with `qcom,sm8150-mtp` / `qcom,sm8150`.
-- SM8150 is the Qualcomm **Lahaina** platform. Mu-Silicium contains `Silicon/Qualcomm/LahainaPkg`, but no Samsung `r5qPkg`; a new Samsung device platform is still needed. HakiOS redwood uses `KodiakPkg` for SM7325 and is not a compatible base.
+- SM8150 is Qualcomm's **msmnile** platform. Mu-Silicium's `LahainaPkg` is for SM8350/Snapdragon 888, not this phone; the current Mu-Silicium tree has no SM8150 `MsmnilePkg` or Samsung `r5qPkg`. New SoC/UEFI support is needed. HakiOS redwood uses `KodiakPkg` for SM7325 and is not a compatible base.
 - The Samsung kernel source's R5Q Rev09 overlay selects `S6E3FA9_AMB667UM01`, **1080 x 2400**, 60 Hz, DSI command mode. It uses Samsung `sec_ts` touch at I2C address `0x48`, interrupt GPIO 87, with 1.8 V / 3.3 V rails.
 - UEFIReader extracted build `BOOT.XF.3.0-00498-SM8150LZB-2` from the phone's XBL. Its `RawFiles/uefiplat.cfg` reports SMEM at `0x86000000`, GIC distributor/redistributor at `0x17A00000` / `0x17A60000`, and a 32 MiB display reservation at `0x9C400000`. The display reservation is **not yet verified as the GOP framebuffer address**.
 - No `2400`, `AMB667`, or `S6E3FA9` panel entry was found in the extracted UEFI XML/CFG files. Do not select one of the unrelated 1080 x 1920 XML panels as a substitute.
@@ -61,7 +61,7 @@ says where its numbers came from; that is the map of what to rewrite.
 - [ ] **Touch**: Samsung `sec_ts` at I2C `0x48`, IRQ GPIO 87, 1.8 V / 3.3 V rails; HakiOS has no `sec_ts` driver.
 - [ ] **Buttons**: Samsung/PMIC controls not mapped to a HakiOS driver.
 - [ ] **Storage**: the phone uses UFS; HakiOS UFS support has not been validated against R5Q's SM8150 controller/firmware.
-- [ ] **CPU and thermal**: eight SM8150 cores identified in the device tree; HakiOS clock and thermal drivers are not ported to Lahaina.
+- [ ] **CPU and thermal**: eight SM8150 cores identified in the device tree; HakiOS clock and thermal drivers are not ported to msmnile.
 - [ ] **GPU**: Adreno 640; HakiOS's current GPU driver targets the Adreno 642L, so it is not enabled for R5Q.
 - [ ] **Wi-Fi, audio, battery, cellular, cameras and haptics**: hardware and firmware mapping and HakiOS driver bring-up remain outstanding.
 

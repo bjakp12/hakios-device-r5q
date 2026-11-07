@@ -17,7 +17,7 @@ def main() -> int:
     platform = (
         "\n"
         "/*\n"
-        " * Samsung Galaxy S10 Lite (r5q), Snapdragon 855 / SM8150 (Lahaina).\n"
+        " * Samsung Galaxy S10 Lite (r5q), Snapdragon 855 / SM8150 (msmnile).\n"
         " * The register window and GIC bases are from the SM8150 device tree and\n"
         " * UEFI's uefiplat.cfg. CPU MPIDRs are 0x0..0x700: four silver CPUs (0..3),\n"
         " * three gold CPUs (4..6), and the gold-prime CPU (7).\n"
