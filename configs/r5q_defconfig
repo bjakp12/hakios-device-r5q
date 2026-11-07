@@ -1,0 +1,4 @@
+# HakiOS defconfig for the Samsung Galaxy S10 Lite (SM-G770F) (r5q): the common kernel, the sm8150 family's facts, and this device's own.
+#include common_defconfig
+#include sm8150.config
+#include r5q.config

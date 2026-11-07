@@ -1,0 +1,69 @@
+name: r5q CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-and-build-loader:
+    # HakiOS documents XNU source builds on macOS with Xcode's toolchain.
+    runs-on: macos-15
+    steps:
+      - name: Check out the r5q device repository
+        uses: actions/checkout@v4
+        with:
+          path: device
+
+      - name: Check out the common HakiOS repository
+        uses: actions/checkout@v4
+        with:
+          repository: oosexgang/hakios-xnu-kernel
+          ref: main
+          path: hakios
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install XNU and loader build dependencies
+        run: |
+          brew install autoconf automake bison flex llvm
+
+      - name: Integrate the device configuration and loader profile
+        run: |
+          mkdir -p hakios/devices/r5q
+          cp -a device/. hakios/devices/r5q/
+          rm -rf hakios/devices/r5q/.git
+          python3 device/scripts/apply-r5q-loader.py hakios/xnuloader/loader.c
+
+      - name: Validate the device and its kernel configuration
+        working-directory: hakios
+        run: |
+          python3 tools/hakios-device.py check r5q
+          make r5q_defconfig
+          make config
+
+      - name: Build the Apple-free loader
+        working-directory: hakios
+        run: PATH="$(brew --prefix llvm)/bin:$PATH" make loader-open
+
+      - name: Build the configured XNU kernel
+        working-directory: hakios
+        run: |
+          export PATH="$(brew --prefix bison)/bin:$(brew --prefix flex)/bin:$PATH"
+          make kernel JOBS=3
+
+      - name: Upload the loader build for inspection
+        uses: actions/upload-artifact@v4
+        with:
+          name: r5q-kernel-loader-candidate
+          path: |
+            hakios/hakios-kernel
+            hakios/xnuloader/loader.efi
+          if-no-files-found: error

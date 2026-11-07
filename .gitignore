@@ -1,0 +1,7 @@
+# Vendor UEFI binaries extracted from this phone are local-only.
+/uefi/files/Binaries/r5q/
+
+# Generated kernel and UEFI build output.
+/.config
+/hakios-kernel
+/xnuloader/loader.efi
