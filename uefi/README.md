@@ -6,7 +6,7 @@ The phone's XBL extraction is staged locally in `files/Binaries/r5q/` (ignored b
 ## Current platform data
 
 - XBL build: `BOOT.XF.3.0-00498-SM8150LZB-2`.
-- Boot image: header version 1, gzip kernel, DTB appended, according to this XBL's `RawFiles/uefiplat.cfg`.
+- The connected stock boot partition is an Android boot image with 4096-byte pages, header version 2, base address 0, kernel offset `0x8000`, ramdisk offset `0x02000000`, and tags offset `0x01e00000`. The HakiOS U-Boot RAM candidate uses the project's legacy header-v1 layout, gzip U-Boot plus the R5Q DTB, with those observed addresses and page size; ABL acceptance still needs to be tested with `fastboot boot`.
 - UEFI firmware region: `0x9FC00000` for `0x00300000` bytes, from the XBL memory map. These values are used by `r5q.toml` and still need verification with the built Mu-Silicium image.
 - Display reservation: `0x9C400000` for `0x02000000` bytes. This is not yet proven to be the GOP framebuffer base.
 - Panel: `S6E3FA9_AMB667UM01`, 1080 x 2400, 60 Hz DSI command mode. The extracted RawFiles XML set has no matching panel description.

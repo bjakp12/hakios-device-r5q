@@ -126,6 +126,7 @@ jobs:
           cp redwood-reference/prebuilt/mkbootimg.py hakios/devices/r5q/prebuilt/mkbootimg.py
           cp device/uefi/files/Resources/DTBs/r5q.dtb hakios/devices/r5q/prebuilt/device-tree.dtb
           python3 device/scripts/apply-r5q-loader.py hakios/xnuloader/loader.c
+          python3 device/scripts/configure-r5q-mkubootimg.py hakios/tools/mkubootimg.py
 
       - name: Download the configured XNU kernel and open loader
         uses: actions/download-artifact@v4
@@ -156,8 +157,13 @@ jobs:
             -u u-boot/build-r5q/u-boot.bin \
             -l xnuloader/loader.efi \
             -p r5q-open-test.xnup \
+            --base 0 \
+            --kernel-offset 0x8000 \
+            --ramdisk-offset 0x02000000 \
+            --tags-offset 0x01e00000 \
+            --pagesize 4096 \
             -o r5q-fastboot-candidate.img
-          python3 -c 'from pathlib import Path; p=Path("r5q-fastboot-candidate.img").read_bytes(); assert p[:8] == b"ANDROID!" and p[0x38:0x3c] == b"ARM\x64"; print(f"validated Android boot image v1 candidate: {len(p)} bytes")'
+          python3 -c 'import struct; from pathlib import Path; p=Path("r5q-fastboot-candidate.img").read_bytes(); assert p[:8] == b"ANDROID!"; ksz,kaddr,rsz,raddr,tags,page,ver=struct.unpack_from("<7I",p,8)[0],struct.unpack_from("<I",p,12)[0],struct.unpack_from("<I",p,16)[0],struct.unpack_from("<I",p,20)[0],struct.unpack_from("<I",p,32)[0],struct.unpack_from("<I",p,36)[0],struct.unpack_from("<I",p,40)[0]; roff=page+((ksz+page-1)//page)*page; assert (page,ver,kaddr,raddr,tags)==(4096,1,0x8000,0x2000000,0x1e00000); assert p[page:page+2]==b"\x1f\x8b" and p[roff:roff+4]==b"HKUB" and rsz>0; print(f"validated Android boot image v{ver}, page={page}, size={len(p)}")'
 
       - name: Upload the fastboot RAM-boot candidate
         uses: actions/upload-artifact@v4
