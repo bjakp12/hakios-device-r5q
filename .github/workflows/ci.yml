@@ -157,14 +157,14 @@ jobs:
         run: |
           find "$GITHUB_WORKSPACE/candidate" -maxdepth 3 -type f -printf '%p %s bytes\n'
           test -s "$GITHUB_WORKSPACE/candidate/hakios-kernel"
-          test -s "$GITHUB_WORKSPACE/candidate/loader.efi"
+          test -s "$GITHUB_WORKSPACE/candidate/xnuloader/loader.efi"
           test -s "$GITHUB_WORKSPACE/candidate/r5q-open-test.xnup"
 
       - name: Stage the boot image inputs
         working-directory: hakios
         run: |
           cp "$GITHUB_WORKSPACE/candidate/hakios-kernel" hakios-kernel
-          cp "$GITHUB_WORKSPACE/candidate/loader.efi" xnuloader/loader.efi
+          cp "$GITHUB_WORKSPACE/candidate/xnuloader/loader.efi" xnuloader/loader.efi
           cp "$GITHUB_WORKSPACE/candidate/r5q-open-test.xnup" r5q-open-test.xnup
           ls -l hakios-kernel xnuloader/loader.efi r5q-open-test.xnup \
             devices/r5q/prebuilt/device-tree.dtb devices/r5q/prebuilt/mkbootimg.py \
