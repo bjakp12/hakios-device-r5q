@@ -93,6 +93,13 @@ jobs:
           ref: main
           path: hakios
 
+      - name: Check out the pinned HakiOS UEFI tools
+        uses: actions/checkout@v4
+        with:
+          repository: oosexgang/hakios-uefi
+          ref: 1c6522893266157506c767e2ca427053ed3634a8
+          path: hakios/uefi
+
       - name: Check out the HakiOS reference mkbootimg tool
         uses: actions/checkout@v4
         with:
