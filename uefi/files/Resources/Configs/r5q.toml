@@ -1,0 +1,16 @@
+# Preliminary packaging values read from this device's XBL uefiplat.cfg.
+# They do not constitute an R5Q UEFI platform or prove that an image boots.
+
+[boot_shim]
+requires_kernel_header = true
+
+[uefi_fd]
+base = 0x9FC00000
+size = 0x300000
+
+[boot_image_kernel]
+kernel_compression = "gzip"
+append_dtb = true
+
+[boot_image]
+header_version = 1
