@@ -99,7 +99,7 @@ jobs:
           repository: oosexgang/hakios-sm7325
           ref: main
           path: redwood-reference
-          sparse-checkout: prebuilt/mkbootimg.py
+          sparse-checkout: prebuilt
 
       - name: Install U-Boot build dependencies
         run: |
