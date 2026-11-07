@@ -13,6 +13,6 @@ The phone's XBL extraction is staged locally in `files/Binaries/r5q/` (ignored b
 
 ## Not built yet
 
-The pinned Mu-Silicium tree has no Samsung `r5qPkg` and no Qualcomm `MsmnilePkg` for SM8150. `r5q.toml` only records the boot-image packaging values; it does not supply an EDK2 platform. Do not use `redwoodPkg`, `KonaPkg`, `LahainaPkg`, or `NapaliPkg` as a drop-in substitute. A matching SM8150 SoC package and Samsung R5Q platform package are required before `uefi/apply.sh r5q` or any phone boot attempt.
+The pinned Mu-Silicium tree has no Samsung `r5qPkg` and no Qualcomm `MsmnilePkg` for SM8150. `r5q.toml` only records boot-image packaging values; it does not supply an EDK2 platform. Do not use `redwoodPkg`, `KonaPkg`, `LahainaPkg`, or `NapaliPkg` as a drop-in substitute. This blocks the Mu-Silicium route. The separate open U-Boot route is under development; its fastboot image candidate must still pass on-device validation before it can be called bootable.
 
 Vendor drivers under `files/Binaries/r5q/` are local-only and must never be committed.

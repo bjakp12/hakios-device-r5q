@@ -76,3 +76,85 @@ jobs:
             hakios/xnuloader/loader.efi
             hakios/r5q-open-test.xnup
           if-no-files-found: error
+
+  package-ram-boot-candidate:
+    needs: validate-and-build-loader
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out the r5q device repository
+        uses: actions/checkout@v4
+        with:
+          path: device
+
+      - name: Check out the common HakiOS repository
+        uses: actions/checkout@v4
+        with:
+          repository: oosexgang/hakios-xnu-kernel
+          ref: main
+          path: hakios
+
+      - name: Check out the HakiOS reference mkbootimg tool
+        uses: actions/checkout@v4
+        with:
+          repository: oosexgang/hakios-sm7325
+          ref: main
+          path: redwood-reference
+          sparse-checkout: prebuilt/mkbootimg.py
+
+      - name: Install U-Boot build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes bc bison build-essential device-tree-compiler flex gcc-aarch64-linux-gnu libgnutls28-dev libssl-dev swig
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Integrate the r5q files
+        run: |
+          mkdir -p hakios/devices/r5q hakios/devices/r5q/prebuilt
+          cp -a device/. hakios/devices/r5q/
+          rm -rf hakios/devices/r5q/.git
+          cp redwood-reference/prebuilt/mkbootimg.py hakios/devices/r5q/prebuilt/mkbootimg.py
+          cp device/uefi/files/Resources/DTBs/r5q.dtb hakios/devices/r5q/prebuilt/device-tree.dtb
+          python3 device/scripts/apply-r5q-loader.py hakios/xnuloader/loader.c
+
+      - name: Download the configured XNU kernel and open loader
+        uses: actions/download-artifact@v4
+        with:
+          name: r5q-kernel-loader-candidate
+          path: candidate
+
+      - name: Prepare the HakiOS U-Boot tree
+        working-directory: hakios
+        run: |
+          uefi/u-boot/apply.sh r5q
+          python3 devices/r5q/scripts/harden-r5q-uboot-loader.py u-boot/cmd/hakios.c
+
+      - name: Build Qualcomm U-Boot for r5q
+        working-directory: hakios
+        env:
+          CROSS_COMPILE: aarch64-linux-gnu-
+          JOBS: "2"
+        run: devices/r5q/scripts/build-r5q-uboot.sh
+
+      - name: Package a fastboot RAM-boot candidate
+        working-directory: hakios
+        run: |
+          cp "$GITHUB_WORKSPACE/candidate/hakios-kernel" hakios-kernel
+          cp "$GITHUB_WORKSPACE/candidate/loader.efi" xnuloader/loader.efi
+          cp "$GITHUB_WORKSPACE/candidate/r5q-open-test.xnup" r5q-open-test.xnup
+          python3 tools/mkubootimg.py -d r5q \
+            -u u-boot/build-r5q/u-boot.bin \
+            -l xnuloader/loader.efi \
+            -p r5q-open-test.xnup \
+            -o r5q-fastboot-candidate.img
+          python3 -c 'from pathlib import Path; p=Path("r5q-fastboot-candidate.img").read_bytes(); assert p[:8] == b"ANDROID!" and p[0x38:0x3c] == b"ARM\x64"; print(f"validated Android boot image v1 candidate: {len(p)} bytes")'
+
+      - name: Upload the fastboot RAM-boot candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: r5q-fastboot-ram-candidate
+          path: hakios/r5q-fastboot-candidate.img
+          if-no-files-found: error

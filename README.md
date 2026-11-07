@@ -3,9 +3,10 @@
 Made by `tools/new-device.py` on 2026-11-07, from the file r5q.dtb. Edit it as the port goes.
 
 This repository is an experimental port scaffold. Its GitHub Actions workflow checks the HakiOS device/configuration and builds
-the configured XNU kernel, an open loader with the provisional R5Q platform profile, and an Apple-free first-boot test payload
-(`r5q-open-test.xnup`). It does not build Darwin userland or R5Q UEFI/U-Boot firmware, and does not certify a fastboot-bootable
-HakiOS image; the GOP framebuffer, UEFI platform, and device drivers still need on-device bring-up.
+the configured XNU kernel, an open loader with the provisional R5Q platform profile, an Apple-free first-boot test payload
+(`r5q-open-test.xnup`), and a U-Boot `fastboot boot` image candidate. The U-Boot image uses the R5Q DTB passed by ABL and keeps
+the phone's partitions untouched. A successful build does not certify that U-Boot or XNU boots on the handset; display/GOP,
+reserved-memory and early-driver behavior still require a controlled device test.
 
 | What | Value |
 |---|---|
@@ -42,13 +43,13 @@ adb. The run scripts add it to the kernel command line. Where each argument come
 ## Bring-up findings (not a working port)
 
 - The live DTB identifies `Samsung R5Q PROJECT Rev09`, compatible with `qcom,sm8150-mtp` / `qcom,sm8150`.
-- SM8150 is Qualcomm's **msmnile** platform. Mu-Silicium's `LahainaPkg` is for SM8350/Snapdragon 888, not this phone; the current Mu-Silicium tree has no SM8150 `MsmnilePkg` or Samsung `r5qPkg`. New SoC/UEFI support is needed. HakiOS redwood uses `KodiakPkg` for SM7325 and is not a compatible base.
+- SM8150 is Qualcomm's **msmnile** platform. Mu-Silicium's `LahainaPkg` is for SM8350/Snapdragon 888, not this phone; the pinned tree has no SM8150 `MsmnilePkg` or Samsung `r5qPkg`. This blocks the Mu-Silicium route. The experimental alternative is open Qualcomm U-Boot (`u-boot/files/`), which receives the live R5Q DTB from ABL; it has not been tested on the handset. HakiOS redwood's `KodiakPkg` is for SM7325 and is not a compatible base.
 - The Samsung kernel source's R5Q Rev09 overlay selects `S6E3FA9_AMB667UM01`, **1080 x 2400**, 60 Hz, DSI command mode. It uses Samsung `sec_ts` touch at I2C address `0x48`, interrupt GPIO 87, with 1.8 V / 3.3 V rails.
 - UEFIReader extracted build `BOOT.XF.3.0-00498-SM8150LZB-2` from the phone's XBL. Its `RawFiles/uefiplat.cfg` reports SMEM at `0x86000000`, GIC distributor/redistributor at `0x17A00000` / `0x17A60000`, and a 32 MiB display reservation at `0x9C400000`. The display reservation is **not yet verified as the GOP framebuffer address**.
 - No `2400`, `AMB667`, or `S6E3FA9` panel entry was found in the extracted UEFI XML/CFG files. Do not select one of the unrelated 1080 x 1920 XML panels as a substitute.
 - The common HakiOS loader currently detects redwood from framebuffer address `0xE1000000`; otherwise it selects QEMU. It has no R5Q platform descriptor, and no R5Q boot has been tested.
 
-The XBL/UEFI extraction is vendor firmware: keep it in the local ignored `uefi/files/Binaries/r5q/` directory only. Never commit it. These findings describe source/configuration, not working hardware support.
+The XBL/UEFI extraction is vendor firmware: keep it in the local ignored `uefi/files/Binaries/r5q/` directory only. Never commit it. The experimental U-Boot route only consumes the public/live DTB and open U-Boot code; the XBL extraction is reserved for a later Mu-Silicium implementation.
 
 ## What is this phone's own
 
