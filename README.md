@@ -3,9 +3,9 @@
 Made by `tools/new-device.py` on 2026-11-07, from the file r5q.dtb. Edit it as the port goes.
 
 This repository is an experimental port scaffold. Its GitHub Actions workflow checks the HakiOS device/configuration and builds
-the configured XNU kernel plus an open loader with the provisional R5Q platform profile. It does not build a Darwin userland or
-UEFI firmware, and does not certify a bootable HakiOS image; the GOP framebuffer, UEFI platform, and device drivers still need
-on-device bring-up.
+the configured XNU kernel, an open loader with the provisional R5Q platform profile, and an Apple-free first-boot test payload
+(`r5q-open-test.xnup`). It does not build Darwin userland or R5Q UEFI/U-Boot firmware, and does not certify a fastboot-bootable
+HakiOS image; the GOP framebuffer, UEFI platform, and device drivers still need on-device bring-up.
 
 | What | Value |
 |---|---|

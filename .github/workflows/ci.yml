@@ -59,6 +59,14 @@ jobs:
           export PATH="$(brew --prefix bison)/bin:$(brew --prefix flex)/bin:$PATH"
           make kernel JOBS=3
 
+      - name: Package an Apple-free first-boot payload
+        working-directory: hakios
+        run: |
+          make hello
+          python3 xnuloader/mkpayload.py -o r5q-open-test.xnup \
+            kernel=hakios-kernel ramdisk=userland/hello \
+            --cmdline "$(python3 tools/hakios-config.py args)"
+
       - name: Upload the kernel and loader candidates
         uses: actions/upload-artifact@v4
         with:
@@ -66,4 +74,5 @@ jobs:
           path: |
             hakios/hakios-kernel
             hakios/xnuloader/loader.efi
+            hakios/r5q-open-test.xnup
           if-no-files-found: error
