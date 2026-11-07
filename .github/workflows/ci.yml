@@ -137,7 +137,7 @@ jobs:
         env:
           CROSS_COMPILE: aarch64-linux-gnu-
           JOBS: "2"
-        run: devices/r5q/scripts/build-r5q-uboot.sh
+        run: bash devices/r5q/scripts/build-r5q-uboot.sh
 
       - name: Package a fastboot RAM-boot candidate
         working-directory: hakios
