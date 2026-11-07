@@ -147,6 +147,11 @@ jobs:
           JOBS: "2"
         run: bash devices/r5q/scripts/build-r5q-uboot.sh
 
+      - name: Verify U-Boot Android image header
+        working-directory: hakios
+        run: |
+          python3 -c 'from pathlib import Path; p=Path("u-boot/build-r5q/u-boot.bin").read_bytes(); print(f"U-Boot bytes={len(p)} header={p[0x38:0x3c].hex()}"); assert p[0x38:0x3c] == bytes([0x41, 0x52, 0x4d, 0x64]), "U-Boot CONFIG_LINUX_KERNEL_IMAGE_HEADER missing or malformed"'
+
       - name: Package the Android fastboot boot image
         working-directory: hakios
         run: |
