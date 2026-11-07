@@ -59,7 +59,7 @@ jobs:
           export PATH="$(brew --prefix bison)/bin:$(brew --prefix flex)/bin:$PATH"
           make kernel JOBS=3
 
-      - name: Upload the loader build for inspection
+      - name: Upload the kernel and loader candidates
         uses: actions/upload-artifact@v4
         with:
           name: r5q-kernel-loader-candidate
